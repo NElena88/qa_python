@@ -1,8 +1,5 @@
 import pytest
 
-
-from main import BooksCollector
-
 class TestBooksCollector:
 
     def test_add_new_book(collector):
@@ -24,6 +21,18 @@ class TestBooksCollector:
     def test_set_book_genre_invalid_book(collector):
         collector.set_book_genre('4891', 'Фантастика')
         assert '4891' not in collector.get_books_genre()
+
+    @pytest.mark.parametrize(
+        'book_name, expected_genre',
+        [
+            ('Колобок', 'Мультфильмы'),
+            ('Шерлок Холмс', 'Детективы'),
+            ('Гарри Поттер', None),
+        ]
+    )
+    def test_get_book_genre_various_cases(collector, book_name, expected_genre):
+        collector.add_new_book('Гарри Поттер')
+        assert collector.get_book_genre(book_name) == expected_genre
 
     @pytest.mark.parametrize(
         'genre, expected_books',
@@ -61,10 +70,10 @@ class TestBooksCollector:
             ('Такой книги нет', False),
         ]
     )
-    def test_add_book_in_favorites_various_cases(collector, name, expected_in_favorites):
-        collector.add_book_in_favorites(name)
-        result = collector.get_list_of_favorites_books()
-        assert (name in result) == expected_in_favorites
+    def test_add_book_in_favorites_various_cases(collector, book_name, expected_in_favorites):
+        collector.add_book_in_favorites(book_name)
+        collector.get_list_of_favorites_books()
+        assert book_name in collector.get_list_of_favorites_books() == expected_in_favorites
 
     def test_add_book_in_favorites_does_not_duplicate(collector):
         collector.add_new_book('Туда и обратно')
