@@ -95,3 +95,5 @@ class TestBooksCollector:
         collector.add_book_in_favorites('Шерлок Холмс')
         result = collector.get_list_of_favorites_books()
         assert result == ['Туда и обратно', 'Шерлок Холмс']
+
+
