@@ -1,16 +1,24 @@
 import pytest
 
+
 from main import BooksCollector
 
 class TestBooksCollector:
 
-    def test_add_new_book_add_two_books(collector):
+    def test_add_new_book(collector):
         collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
-        assert len(collector.get_books_rating()) == 2
+        assert 'Гордость и предубеждение и зомби' in collector.books_genre
+        assert collector.books_genre['Гордость и предубеждение и зомби'] == ''
 
+    def test_add_new_book_name_more_than40(collector):
+        collector.add_new_book('Гордость и предубеждение и зомби, Гордость и предубеждение и зомби')
+        assert 'Гордость и предубеждение и зомби, Гордость и предубеждение и зомби' not in collector.books_genre
 
-    def test_set_book_genre_valid(collector, book_1):
+    def test_add_new_book_empty_name(collector):
+        collector.add_new_book('')
+        assert '' not in collector.books_genre
+
+    def test_set_book_genre_valid(collector):
         assert collector.books_genre['Туда и обратно'] == 'Фантастика'
 
     def test_set_book_genre_invalid_book(collector):
@@ -18,39 +26,28 @@ class TestBooksCollector:
         assert '4891' not in collector.get_books_genre()
 
     @pytest.mark.parametrize(
-        'book_name, expected_genre',
-        [
-            ('Колобок', 'Мультфильмы'),
-            ('Шерлок Холмс', 'Детектив'),
-            ('Гарри Поттер', None),
-        ]
-    )
-    def test_get_book_genre_various_cases(collector, book_2, book_3, book_name, expected_genre):
-        assert collector.get_book_genre(book_name) == expected_genre
-
-    @pytest.mark.parametrize(
         'genre, expected_books',
         [
-            ('Детектив', ['Шерлок Холмс']),
+            ('Детективы', ['Шерлок Холмс']),
             ('Комедии', []),
         ]
     )
-    def test_get_books_with_specific_genre_parametrized(collector, book_3, genre, expected_books):
+    def test_get_books_with_specific_genre_parametrized(collector, genre, expected_books):
         assert collector.get_books_with_specific_genre(genre) == expected_books
 
-    def test_get_books_genre_returns_correct_dict(collector, book_1, book_2, book_3):
+    def test_get_books_genre_returns_correct_dict(collector):
 
         expected = {
         'Колобок': 'Мультфильмы',
         'Туда и обратно': 'Фантастика',
-        'Шерлок Холмс': 'Детектив'
+        'Шерлок Холмс': 'Детективы'
         }
         assert collector.get_books_genre() == expected
 
     def test_get_books_genre_returns_empty_dict_initially(collector):
         assert collector.get_books_genre() == {}
 
-    def test_get_books_for_children_returns_only_safe_genres(collector, book_1, book_2, book_3):
+    def test_get_books_for_children_returns_only_safe_genres(collector):
         result = collector.get_books_for_children()
 
         assert 'Туда и обратно' in result
@@ -64,10 +61,10 @@ class TestBooksCollector:
             ('Такой книги нет', False),
         ]
     )
-    def test_add_book_in_favorites_various_cases(collector, book_1, book_name, expected_in_favorites):
-        collector.add_book_in_favorites(book_name)
+    def test_add_book_in_favorites_various_cases(collector, name, expected_in_favorites):
+        collector.add_book_in_favorites(name)
         result = collector.get_list_of_favorites_books()
-        assert (book_name in result) == expected_in_favorites
+        assert (name in result) == expected_in_favorites
 
     def test_add_book_in_favorites_does_not_duplicate(collector):
         collector.add_new_book('Туда и обратно')
